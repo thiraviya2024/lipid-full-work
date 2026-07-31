@@ -4,7 +4,11 @@ from fastapi.middleware.cors import CORSMiddleware
 import logging
 
 from app.core.config import settings
-from app.api.routes import upload, analyze, report, admin, blood_test
+from app.api.routes import router as upload_router
+from app.api.routes import analyze_router
+from app.api.routes import report_router
+from app.api.routes import admin_router
+from app.api.routes import blood_test_router
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -27,11 +31,11 @@ app.add_middleware(
 )
 
 # Register all routers
-app.include_router(upload.router)
-app.include_router(analyze.router)
-app.include_router(report.router)
-app.include_router(admin.router)
-app.include_router(blood_test.router)
+app.include_router(upload_router)
+app.include_router(analyze_router)
+app.include_router(report_router)
+app.include_router(admin_router)
+app.include_router(blood_test_router)
 
 
 @app.on_event("startup")
