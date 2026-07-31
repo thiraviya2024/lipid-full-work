@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import logging
 
 from app.core.config import settings
-from app.api.routes import upload, analyze, report, admin, blood_test
+from app.api.routes import upload, analyze, report, admin
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -31,13 +31,12 @@ app.include_router(upload.router)
 app.include_router(analyze.router)
 app.include_router(report.router)
 app.include_router(admin.router)
-app.include_router(blood_test.router)  # NEW: Blood test router
 
 
 @app.on_event("startup")
 async def startup_event():
     logger.info(f"🚀 Starting {settings.APP_NAME} v{settings.APP_VERSION}")
-    logger.info("✅ LipidAI API with Blood Test Analysis is ready!")
+    logger.info("✅ LipidAI API is ready!")
 
 
 @app.get("/")
@@ -50,7 +49,6 @@ async def root():
         "endpoints": [
             "/upload/report",
             "/analyze/manual",
-            "/blood-test/analyze",
             "/report/generate",
             "/admin/rules",
             "/admin/stats"
