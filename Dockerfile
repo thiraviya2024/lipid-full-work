@@ -2,10 +2,12 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install system dependencies (removed libgl1-mesa-glx)
+# Install system dependencies including Tesseract
 RUN apt-get update && apt-get install -y \
     gcc \
     libglib2.0-0 \
+    tesseract-ocr \
+    tesseract-ocr-eng \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
