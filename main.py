@@ -4,11 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import logging
 
 from app.core.config import settings
-from app.api.routes import router as upload_router
-from app.api.routes import analyze_router
-from app.api.routes import report_router
-from app.api.routes import admin_router
-from app.api.routes import blood_test_router
+from app.api.routes import upload, analyze, report, admin, blood_test
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -21,7 +17,9 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
-# CORS middleware
+# ============================================================
+# CORS middleware - Allows frontend to communicate with backend
+# ============================================================
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.ALLOWED_ORIGINS,
@@ -31,11 +29,11 @@ app.add_middleware(
 )
 
 # Register all routers
-app.include_router(upload_router)
-app.include_router(analyze_router)
-app.include_router(report_router)
-app.include_router(admin_router)
-app.include_router(blood_test_router)
+app.include_router(upload.router)
+app.include_router(analyze.router)
+app.include_router(report.router)
+app.include_router(admin.router)
+app.include_router(blood_test.router)
 
 
 @app.on_event("startup")
