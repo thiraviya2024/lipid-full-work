@@ -16,12 +16,18 @@ class ThyroidService:
     def __init__(self):
         self.engine = ThyroidEngine()
     
+    def analyze_values(self, values: Dict[str, float]) -> Dict[str, Any]:
+        """Analyze Thyroid values."""
+        return self.analyze(values)
+    
     def analyze(self, values: Dict[str, float]) -> Dict[str, Any]:
         """Analyze Thyroid values."""
         results = self.engine.evaluate(values)
+        risks = self.engine.get_disease_risks(results)
         
         total_params = len(results)
         abnormal_count = sum(1 for v in results.values() if v.get('status') not in ['Normal', 'Good result'])
+        normal_count = total_params - abnormal_count
         
         if abnormal_count == 0:
             overall_status = "Normal"
@@ -43,6 +49,8 @@ class ThyroidService:
             'status_color': status_color,
             'total_parameters': total_params,
             'abnormal_count': abnormal_count,
-            'normal_count': total_params - abnormal_count,
-            'results': results
+            'normal_count': normal_count,
+            'results': results,
+            'disease_risks': risks,
+            'category': 'thyroid'
         }

@@ -16,7 +16,12 @@ class VitaminsService:
     def __init__(self):
         self.engine = VitaminsEngine()
     
-    def analyze(self, values: Dict[str, float]) -> Dict[str, Any]:
+    
+    def analyze_values(self, values: Dict[str, float]) -> Dict[str, Any]:
+        """Analyze values - API compatibility method."""
+        return self.analyze(values)
+
+def analyze(self, values: Dict[str, float]) -> Dict[str, Any]:
         """Analyze Vitamins values."""
         results = self.engine.evaluate(values)
         
