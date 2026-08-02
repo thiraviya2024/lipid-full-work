@@ -45,8 +45,8 @@ async def analyze_cbc_values(request: CBCValuesRequest):
     """
     try:
         service = CBCService()
-        gender = request.patient_info.get('gender') if request.patient_info else None
-        result = service.analyze_values(request.values, gender)
+        # FIXED: Removed gender argument - only passing values
+        result = service.analyze_values(request.values)
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
