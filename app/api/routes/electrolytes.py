@@ -44,6 +44,7 @@ async def analyze_electrolytes_values(request: ElectrolytesValuesRequest):
     """
     try:
         service = ElectrolytesService()
+        # FIXED: Removed patient_info argument - only passing values
         result = service.analyze_values(request.values)
         return result
     except Exception as e:
