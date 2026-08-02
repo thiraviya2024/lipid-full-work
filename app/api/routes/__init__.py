@@ -1,6 +1,6 @@
 # app/api/routes/__init__.py
-from .upload import router
-from .analyze import router as analyze_router
-from .report import router as report_router
-from .admin import router as admin_router
-from .blood_test import router as blood_test_router
+from .upload import router as upload
+from .analyze import router as analyze
+from .report import router as report
+from .admin import router as admin
+from .blood_test import router as blood_test

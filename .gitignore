@@ -73,3 +73,16 @@ temp_*.py
 clinical/testgroq.py
 *.key
 *.secret
+# Medical reports and generated files
+reports/
+*.pdf
+
+# SQL database dumps
+*.sql
+
+# Uploaded files
+uploads/
+outputs/
+
+# Generated AI files
+downloaded_report.pdf

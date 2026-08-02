@@ -1,46 +1,63 @@
-# app/core/config.py
 from pydantic_settings import BaseSettings
-from typing import Optional
+from pydantic import Field, field_validator, ValidationInfo
+import os
 
 
 class Settings(BaseSettings):
     # Database
     DATABASE_URL: str = "postgresql://postgres:password@localhost:5432/lipidai"
     
-    # MIMIC Database
+    # MIMIC Database (add this line!)
     MIMIC_DATABASE_URL: Optional[str] = None
     
     # Groq
     GROQ_API_KEY: Optional[str] = None
     GROQ_MODEL: str = "llama-3.3-70b-versatile"
     
-    # App
-    APP_NAME: str = "LipidAI API"
-    APP_VERSION: str = "2.0.0"
-    DEBUG: bool = False
+    OPENAI_API_KEY: Optional[str] = None
+    OPENAI_MODEL: str = "gpt-4o"
     
-    # File Upload
+    OLLAMA_BASE_URL: str = "http://localhost:11434"
+    OLLAMA_MODEL: str = "llama2"
+    
+    DEEPSEEK_API_KEY: Optional[str] = None
+    DEEPSEEK_MODEL: str = "deepseek-chat"
+    
+    DEFAULT_LLM_PROVIDER: str = "groq"  # groq, openai, ollama, deepseek
+    
+    # ============================================================
+    # FILE UPLOAD
+    # ============================================================
     UPLOAD_DIR: str = "./uploads"
-    ALLOWED_EXTENSIONS: list = [".pdf", ".docx", ".txt", ".xlsx", ".xls", ".csv", ".jpg", ".jpeg", ".png"]
-    
-    # ============================================================
-    # CORS - Allowed Origins
-    # Add any frontend URLs that need to access this API
-    # ============================================================
-    ALLOWED_ORIGINS: list = [
-        "http://localhost:3000",          # React default
-        "http://localhost:5500",          # VS Code Live Server
-        "http://127.0.0.1:5500",          # VS Code Live Server (IP)
-        "http://127.0.0.1:3000",          # React (IP)
-        "https://lipidai-frontend.vercel.app",  # Vercel deployment
-        "https://lipidai-frontend.netlify.app", # Netlify deployment
-        "*"  # For testing - allows all origins (remove in production)
+    MAX_FILE_SIZE: int = 10 * 1024 * 1024  # 10MB
+    ALLOWED_EXTENSIONS: List[str] = [
+        ".pdf", ".docx", ".doc", ".txt", 
+        ".xlsx", ".xls", ".csv",
+        ".png", ".jpg", ".jpeg", ".gif", ".tiff"
     ]
+    ALLOWED_MIME_TYPES: List[str] = [
+        "application/pdf",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "application/msword",
+        "text/plain",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "application/vnd.ms-excel",
+        "text/csv",
+        "image/png",
+        "image/jpeg",
+        "image/gif",
+        "image/tiff",
+    ]
+    
+    # CORS
+    ALLOWED_ORIGINS: list = ["http://localhost:3000", "http://localhost:8000"]
     
     class Config:
         env_file = ".env"
+        env_file_encoding = "utf-8"
         case_sensitive = True
-        extra = "ignore"
+        extra = "ignore"  # This ignores extra fields from .env
 
 
+# Singleton instance
 settings = Settings()
