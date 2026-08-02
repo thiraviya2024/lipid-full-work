@@ -17,7 +17,7 @@ class LipidService:
         self.engine = LipidEngine()
     
     def analyze_values(self, values: Dict[str, float]) -> Dict[str, Any]:
-        """Analyze lipid values - alias for analyze() for API compatibility."""
+        """Analyze lipid values - API compatibility method."""
         return self.analyze(values)
     
     def analyze(self, values: Dict[str, float]) -> Dict[str, Any]:

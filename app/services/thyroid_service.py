@@ -17,7 +17,7 @@ class ThyroidService:
         self.engine = ThyroidEngine()
     
     def analyze_values(self, values: Dict[str, float]) -> Dict[str, Any]:
-        """Analyze Thyroid values."""
+        """Analyze Thyroid values - API compatibility method."""
         return self.analyze(values)
     
     def analyze(self, values: Dict[str, float]) -> Dict[str, Any]:

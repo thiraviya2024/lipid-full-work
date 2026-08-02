@@ -18,32 +18,13 @@ class CBCService:
         self.engine = CBCEngine()
         self.extractor = CBCExtractor()
     
-    def analyze_text(self, text: str, gender: Optional[str] = None) -> Dict[str, Any]:
-        """
-        Analyze CBC from text.
-        
-        Args:
-            text: Raw text containing CBC values
-            gender: Patient gender
-            
-        Returns:
-            Analysis results
-        """
-        # Extract values from text
-        values = self.extractor.extract(text)
-        
-        if not values:
-            return {
-                'success': False,
-                'message': 'No CBC values found in the text',
-                'results': {}
-            }
-        
-        return self.analyze_values(values, gender)
+    def analyze_values(self, values: Dict[str, float]) -> Dict[str, Any]:
+        """Analyze CBC values - API compatibility method."""
+        return self.analyze(values)
     
-    def analyze_values(self, values: Dict[str, float], gender: Optional[str] = None) -> Dict[str, Any]:
+    def analyze(self, values: Dict[str, float]) -> Dict[str, Any]:
         """Analyze CBC values."""
-        results = self.engine.evaluate(values, gender)
+        results = self.engine.evaluate(values)
         risks = self.engine.get_disease_risks(results)
         
         total_params = len(results)
@@ -73,6 +54,15 @@ class CBCService:
             'category': 'cbc'
         }
     
-    def analyze(self, values: Dict[str, float]) -> Dict[str, Any]:
-        """Alias for analyze_values for backward compatibility."""
+    def analyze_text(self, text: str, gender: Optional[str] = None) -> Dict[str, Any]:
+        """Analyze CBC from text."""
+        values = self.extractor.extract(text)
+        
+        if not values:
+            return {
+                'success': False,
+                'message': 'No CBC values found in the text',
+                'results': {}
+            }
+        
         return self.analyze_values(values)
