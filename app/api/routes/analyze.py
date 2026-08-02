@@ -9,6 +9,7 @@ from pydantic import BaseModel
 import os
 import shutil
 from datetime import datetime
+import io
 
 from app.services.lipid_service import LipidService
 from app.services.cbc_service import CBCService
@@ -42,6 +43,52 @@ class ManualEntryRequest(BaseModel):
     vitamins_values: Optional[Dict[str, float]] = None
     electrolytes_values: Optional[Dict[str, float]] = None
     patient_info: Optional[Dict[str, Any]] = None
+
+
+def extract_text_from_file(file_path: str, file_extension: str) -> str:
+    """Extract text from various file types."""
+    text_content = ""
+    
+    try:
+        if file_extension in ['.txt', '.csv']:
+            # Read text files directly
+            with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+                text_content = f.read()
+                
+        elif file_extension == '.pdf':
+            try:
+                import pdfplumber
+                with pdfplumber.open(file_path) as pdf:
+                    text_content = " ".join([page.extract_text() or "" for page in pdf.pages])
+            except ImportError:
+                text_content = "PDF parsing requires pdfplumber. Please install: pip install pdfplumber"
+                
+        elif file_extension in ['.docx', '.doc']:
+            try:
+                import docx
+                doc = docx.Document(file_path)
+                text_content = " ".join([para.text for para in doc.paragraphs])
+            except ImportError:
+                text_content = "DOCX parsing requires python-docx. Please install: pip install python-docx"
+                
+        elif file_extension in ['.xlsx', '.xls']:
+            try:
+                import pandas as pd
+                df = pd.read_excel(file_path)
+                text_content = df.to_string()
+            except ImportError:
+                text_content = "Excel parsing requires pandas and openpyxl. Please install: pip install pandas openpyxl"
+                
+        elif file_extension in ['.png', '.jpg', '.jpeg', '.gif', '.tiff']:
+            text_content = "Image files require OCR. Please use text-based files for now."
+            
+        else:
+            text_content = f"File uploaded: {file_path}. Manual analysis not available for this file type."
+            
+    except Exception as e:
+        text_content = f"Error extracting text: {str(e)}"
+    
+    return text_content
 
 
 @router.post("/analyze/manual")
@@ -112,7 +159,7 @@ async def analyze_manual(
 @router.post("/analyze/file")
 async def analyze_file(
     file: UploadFile = File(...),
-    module: str = Query("lipid", description="Module to analyze: lipid, cbc, lft, kft, thyroid, diabetes, vitamins, electrolytes"),
+    module: str = Query("cbc", description="Module to analyze: lipid, cbc, lft, kft, thyroid, diabetes, vitamins, electrolytes"),
     patient_info: Optional[str] = None
 ):
     """
@@ -133,46 +180,29 @@ async def analyze_file(
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
         
-        # Read text from file based on extension
+        # Get file extension
         file_extension = os.path.splitext(file.filename)[1].lower()
-        text_content = ""
         
-        if file_extension in ['.txt', '.csv']:
-            # Read text files directly
-            with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
-                text_content = f.read()
-        elif file_extension == '.pdf':
-            # For PDF, use pdfplumber or PyPDF2
-            try:
-                import pdfplumber
-                with pdfplumber.open(file_path) as pdf:
-                    text_content = " ".join([page.extract_text() or "" for page in pdf.pages])
-            except ImportError:
-                text_content = "PDF parsing requires pdfplumber. Please install: pip install pdfplumber"
-        elif file_extension in ['.docx', '.doc']:
-            # For DOCX
-            try:
-                import docx
-                doc = docx.Document(file_path)
-                text_content = " ".join([para.text for para in doc.paragraphs])
-            except ImportError:
-                text_content = "DOCX parsing requires python-docx. Please install: pip install python-docx"
-        else:
-            text_content = f"File uploaded: {file.filename}. Manual analysis not available for this file type."
+        # Extract text from file
+        text_content = extract_text_from_file(file_path, file_extension)
         
         # Determine which module to use
+        result = {}
+        
         if module == "cbc":
             extractor = CBCExtractor()
             values = extractor.extract(text_content)
             if values:
                 service = CBCService()
                 result = service.analyze_values(values)
+                result['message'] = 'CBC analysis completed from file'
             else:
                 result = {
                     'success': False,
                     'message': 'No CBC values found in the file. Please use Manual Entry.',
                     'results': {}
                 }
+        
         elif module == "lipid":
             # For lipid, try to extract from text or use manual entry
             result = {
@@ -180,6 +210,7 @@ async def analyze_file(
                 'message': 'File analysis for Lipid is not fully implemented yet. Please use Manual Entry for now.',
                 'results': {}
             }
+        
         else:
             result = {
                 'success': False,
