@@ -59,18 +59,14 @@ class Settings(BaseSettings):
     PASSWORD_RESET_TOKEN_EXPIRE_HOURS: int = 24
     
     # ============================================================
-    # CORS
+    # CORS - FIXED
     # ============================================================
     ALLOWED_ORIGINS: List[str] = [
-        "http://localhost:3000",
-        "http://localhost:5500",
-        "http://127.0.0.1:5500",
-        "https://lifesaver.vercel.app",
-        "https://lifesaver.netlify.app",
+        "*"  # Allow all origins for development
     ]
     ALLOWED_METHODS: List[str] = ["*"]
     ALLOWED_HEADERS: List[str] = ["*"]
-    ALLOW_CREDENTIALS: bool = True
+    ALLOW_CREDENTIALS: bool = False  # Must be False with "*"
     
     # ============================================================
     # LLM / AI
