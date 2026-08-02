@@ -44,6 +44,7 @@ async def analyze_diabetes_values(request: DiabetesValuesRequest):
     """
     try:
         service = DiabetesService()
+        # FIXED: Removed patient_info argument - only passing values
         result = service.analyze_values(request.values)
         return result
     except Exception as e:
