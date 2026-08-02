@@ -1,4 +1,4 @@
-﻿# app/engines/clinical_engine/lft_engine.py
+# app/engines/clinical_engine/lft_engine.py
 """LFT Clinical Engine"""
 
 from typing import Dict, List, Any
