@@ -21,26 +21,28 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
-# CORS middleware
+# ============================================================
+# CORS MIDDLEWARE - UPDATED FOR DEVELOPMENT
+# ============================================================
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.ALLOWED_ORIGINS,
-    allow_credentials=True,
+    allow_origins=["*"],  # Allow all origins for development
+    allow_credentials=False,  # Must be False when using allow_origins=["*"]
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# ============================================================
 # API Prefix
+# ============================================================
 API_V1_PREFIX = "/api/v1"
 
-# Register routers - Core Modules
+# Register routers
 app.include_router(upload.router, prefix=API_V1_PREFIX, tags=["Upload"])
 app.include_router(analyze.router, prefix=API_V1_PREFIX, tags=["Analysis"])
 app.include_router(report.router, prefix=API_V1_PREFIX, tags=["Report"])
 app.include_router(admin.router, prefix=API_V1_PREFIX, tags=["Admin"])
 app.include_router(blood_test.router, prefix=API_V1_PREFIX, tags=["Blood Test"])
-
-# Register routers - 8 Clinical Modules
 app.include_router(cbc.router, prefix=API_V1_PREFIX, tags=["CBC"])
 app.include_router(lft.router, prefix=API_V1_PREFIX, tags=["LFT"])
 app.include_router(kft.router, prefix=API_V1_PREFIX, tags=["KFT"])
@@ -48,8 +50,6 @@ app.include_router(thyroid.router, prefix=API_V1_PREFIX, tags=["Thyroid"])
 app.include_router(diabetes.router, prefix=API_V1_PREFIX, tags=["Diabetes"])
 app.include_router(vitamins.router, prefix=API_V1_PREFIX, tags=["Vitamins"])
 app.include_router(electrolytes.router, prefix=API_V1_PREFIX, tags=["Electrolytes"])
-
-# Register routers - Additional Features
 app.include_router(analytics.router, prefix=API_V1_PREFIX, tags=["Analytics"])
 app.include_router(auth.router, prefix=API_V1_PREFIX, tags=["Auth"])
 app.include_router(disease.router, prefix=API_V1_PREFIX, tags=["Disease"])
@@ -66,6 +66,7 @@ async def startup_event():
     logger.info("✅ LipidAI API with ALL 8 Modules is COMPLETE! 🎉")
     logger.info("📊 Modules: Lipid, CBC, LFT, KFT, Thyroid, Diabetes, Vitamins, Electrolytes")
     logger.info(f"📡 Total Routes: {len(app.routes)}")
+    logger.info("🔓 CORS: All origins allowed (development mode)")
 
 
 @app.get("/")
@@ -133,7 +134,7 @@ async def api_status():
             "patient": "✅ active"
         },
         "total_modules": 19,
-        "endpoints_count": 52,
+        "endpoints_count": 60,
         "docs": "/docs",
         "message": "🎉 All modules are complete! System ready for production!"
     }
