@@ -44,6 +44,7 @@ async def analyze_thyroid_values(request: ThyroidValuesRequest):
     """
     try:
         service = ThyroidService()
+        # FIXED: Removed patient_info argument - only passing values
         result = service.analyze_values(request.values)
         return result
     except Exception as e:
