@@ -45,8 +45,8 @@ async def analyze_vitamins_values(request: VitaminsValuesRequest):
     """
     try:
         service = VitaminsService()
-        gender = request.patient_info.get('gender') if request.patient_info else None
-        result = service.analyze_values(request.values, gender)
+        # FIXED: Removed patient_info argument - only passing values
+        result = service.analyze_values(request.values)
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
