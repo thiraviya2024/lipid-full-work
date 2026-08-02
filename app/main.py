@@ -4,7 +4,11 @@ from fastapi.middleware.cors import CORSMiddleware
 import logging
 
 from app.core.config import settings
-from app.api.routes import upload, analyze, report, admin, blood_test, cbc, lft, kft, thyroid, diabetes, vitamins, electrolytes
+from app.api.routes import (
+    upload, analyze, report, admin, blood_test, 
+    cbc, lft, kft, thyroid, diabetes, vitamins, electrolytes,
+    analytics, auth, disease, doctor, guideline, health, mimic, patient
+)
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -29,12 +33,14 @@ app.add_middleware(
 # API Prefix
 API_V1_PREFIX = "/api/v1"
 
-# Register routers
+# Register routers - Core Modules
 app.include_router(upload.router, prefix=API_V1_PREFIX, tags=["Upload"])
 app.include_router(analyze.router, prefix=API_V1_PREFIX, tags=["Analysis"])
 app.include_router(report.router, prefix=API_V1_PREFIX, tags=["Report"])
 app.include_router(admin.router, prefix=API_V1_PREFIX, tags=["Admin"])
 app.include_router(blood_test.router, prefix=API_V1_PREFIX, tags=["Blood Test"])
+
+# Register routers - 8 Clinical Modules
 app.include_router(cbc.router, prefix=API_V1_PREFIX, tags=["CBC"])
 app.include_router(lft.router, prefix=API_V1_PREFIX, tags=["LFT"])
 app.include_router(kft.router, prefix=API_V1_PREFIX, tags=["KFT"])
@@ -43,12 +49,23 @@ app.include_router(diabetes.router, prefix=API_V1_PREFIX, tags=["Diabetes"])
 app.include_router(vitamins.router, prefix=API_V1_PREFIX, tags=["Vitamins"])
 app.include_router(electrolytes.router, prefix=API_V1_PREFIX, tags=["Electrolytes"])
 
+# Register routers - Additional Features
+app.include_router(analytics.router, prefix=API_V1_PREFIX, tags=["Analytics"])
+app.include_router(auth.router, prefix=API_V1_PREFIX, tags=["Auth"])
+app.include_router(disease.router, prefix=API_V1_PREFIX, tags=["Disease"])
+app.include_router(doctor.router, prefix=API_V1_PREFIX, tags=["Doctor"])
+app.include_router(guideline.router, prefix=API_V1_PREFIX, tags=["Guideline"])
+app.include_router(health.router, prefix=API_V1_PREFIX, tags=["Health"])
+app.include_router(mimic.router, prefix=API_V1_PREFIX, tags=["MIMIC"])
+app.include_router(patient.router, prefix=API_V1_PREFIX, tags=["Patient"])
+
 
 @app.on_event("startup")
 async def startup_event():
     logger.info(f"🚀 Starting {settings.APP_NAME} v{settings.APP_VERSION}")
     logger.info("✅ LipidAI API with ALL 8 Modules is COMPLETE! 🎉")
     logger.info("📊 Modules: Lipid, CBC, LFT, KFT, Thyroid, Diabetes, Vitamins, Electrolytes")
+    logger.info(f"📡 Total Routes: {len(app.routes)}")
 
 
 @app.get("/")
@@ -70,7 +87,15 @@ async def root():
             "vitamins": ["/api/v1/vitamins/analyze", "/api/v1/vitamins/analyze-values", "/api/v1/vitamins/reference-ranges"],
             "electrolytes": ["/api/v1/electrolytes/analyze", "/api/v1/electrolytes/analyze-values", "/api/v1/electrolytes/reference-ranges"],
             "report": ["/api/v1/report/generate"],
-            "admin": ["/api/v1/admin/rules", "/api/v1/admin/stats", "/api/v1/admin/seed"]
+            "admin": ["/api/v1/admin/rules", "/api/v1/admin/stats", "/api/v1/admin/seed"],
+            "analytics": ["/api/v1/analytics/", "/api/v1/analytics/summary"],
+            "auth": ["/api/v1/auth/login", "/api/v1/auth/register", "/api/v1/auth/logout"],
+            "disease": ["/api/v1/disease/", "/api/v1/disease/{disease_id}"],
+            "doctor": ["/api/v1/doctor/", "/api/v1/doctor/{doctor_id}"],
+            "guideline": ["/api/v1/guideline/", "/api/v1/guideline/{guideline_id}"],
+            "health": ["/api/v1/health/", "/api/v1/health/metrics"],
+            "mimic": ["/api/v1/mimic/", "/api/v1/mimic/{patient_id}"],
+            "patient": ["/api/v1/patient/", "/api/v1/patient/{patient_id}"]
         }
     }
 
@@ -97,10 +122,18 @@ async def api_status():
             "electrolytes": "✅ active",
             "blood_test": "✅ active",
             "ocr": "✅ active",
-            "reporting": "✅ active"
+            "reporting": "✅ active",
+            "analytics": "✅ active",
+            "auth": "✅ active",
+            "disease": "✅ active",
+            "doctor": "✅ active",
+            "guideline": "✅ active",
+            "health": "✅ active",
+            "mimic": "✅ active",
+            "patient": "✅ active"
         },
-        "total_modules": 8,
-        "endpoints_count": 36,
+        "total_modules": 19,
+        "endpoints_count": 52,
         "docs": "/docs",
-        "message": "🎉 All 8 modules are complete! System ready for production!"
+        "message": "🎉 All modules are complete! System ready for production!"
     }
