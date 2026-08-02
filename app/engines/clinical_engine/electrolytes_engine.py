@@ -1,4 +1,4 @@
-﻿# app/engines/clinical_engine/electrolytes_engine.py
+# app/engines/clinical_engine/electrolytes_engine.py
 """Electrolytes Clinical Engine"""
 
 from typing import Dict, List, Any
@@ -47,3 +47,69 @@ class ElectrolytesEngine:
                     }
         
         return results
+    
+    def get_disease_risks(self, results: Dict[str, Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """Identify disease risks based on Electrolytes results."""
+        risks = []
+        
+        # Hypercalcemia
+        if 'calcium' in results:
+            if results['calcium']['status'] in ['High', 'Very High']:
+                risks.append({
+                    'disease': 'Hypercalcemia',
+                    'confidence': 'High' if results['calcium']['status'] == 'Very High' else 'Medium',
+                    'reason': f"Elevated calcium ({results['calcium']['status']})",
+                    'recommendation': 'Check PTH, vitamin D, consider malignancy workup, consult endocrinologist'
+                })
+        
+        # Hypocalcemia
+        if 'calcium' in results:
+            if results['calcium']['status'] in ['Low', 'Very Low']:
+                risks.append({
+                    'disease': 'Hypocalcemia',
+                    'confidence': 'High' if results['calcium']['status'] == 'Very Low' else 'Medium',
+                    'reason': f"Low calcium ({results['calcium']['status']})",
+                    'recommendation': 'Check vitamin D, PTH, calcium supplementation, consult physician'
+                })
+        
+        # Hypermagnesemia
+        if 'magnesium' in results:
+            if results['magnesium']['status'] in ['High', 'Very High']:
+                risks.append({
+                    'disease': 'Hypermagnesemia',
+                    'confidence': 'High' if results['magnesium']['status'] == 'Very High' else 'Medium',
+                    'reason': f"Elevated magnesium ({results['magnesium']['status']})",
+                    'recommendation': 'Check renal function, review medications, consult nephrologist'
+                })
+        
+        # Hypomagnesemia
+        if 'magnesium' in results:
+            if results['magnesium']['status'] in ['Low', 'Very Low']:
+                risks.append({
+                    'disease': 'Hypomagnesemia',
+                    'confidence': 'High' if results['magnesium']['status'] == 'Very Low' else 'Medium',
+                    'reason': f"Low magnesium ({results['magnesium']['status']})",
+                    'recommendation': 'Magnesium supplementation, check renal function, consult physician'
+                })
+        
+        # Hyperphosphatemia
+        if 'phosphorus' in results:
+            if results['phosphorus']['status'] in ['High', 'Very High']:
+                risks.append({
+                    'disease': 'Hyperphosphatemia',
+                    'confidence': 'High' if results['phosphorus']['status'] == 'Very High' else 'Medium',
+                    'reason': f"Elevated phosphorus ({results['phosphorus']['status']})",
+                    'recommendation': 'Check renal function, phosphate binders, dietary changes, consult nephrologist'
+                })
+        
+        # Hypophosphatemia
+        if 'phosphorus' in results:
+            if results['phosphorus']['status'] in ['Low', 'Very Low']:
+                risks.append({
+                    'disease': 'Hypophosphatemia',
+                    'confidence': 'High' if results['phosphorus']['status'] == 'Very Low' else 'Medium',
+                    'reason': f"Low phosphorus ({results['phosphorus']['status']})",
+                    'recommendation': 'Phosphorus supplementation, check nutrition status, consult physician'
+                })
+        
+        return risks
