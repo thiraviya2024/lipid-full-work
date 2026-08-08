@@ -23,6 +23,7 @@ from . import guideline
 from . import health
 from . import mimic
 from . import patient
+from . import ai  # ✅ AI Orchestrator
 
 __all__ = [
     'upload',
@@ -44,5 +45,6 @@ __all__ = [
     'guideline',
     'health',
     'mimic',
-    'patient'
+    'patient',
+    'ai'  # ✅ Add ai to exports
 ]

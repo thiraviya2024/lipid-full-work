@@ -27,7 +27,7 @@ app = FastAPI(
 # ============================================================
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins for development
+    allow_origins=["*"],
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -140,7 +140,6 @@ async def health_check():
 
 @app.get("/api/v1/status")
 async def api_status():
-    """Get comprehensive API status with all modules."""
     return {
         "status": "healthy",
         "version": settings.APP_VERSION,
@@ -167,7 +166,7 @@ async def api_status():
             "ai_orchestrator": "✅ active (Groq + Gemini)"
         },
         "total_modules": 20,
-        "endpoints_count": 69,  # Updated from 65 to 69
+        "endpoints_count": 69,
         "docs": "/docs",
         "message": "🎉 All modules are complete! System ready for production!"
     }
