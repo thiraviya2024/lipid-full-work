@@ -23,7 +23,12 @@ from . import guideline
 from . import health
 from . import mimic
 from . import patient
-from . import ai  # ✅ AI Orchestrator
+
+# Conditional import for AI to avoid circular import
+try:
+    from . import ai
+except ImportError:
+    ai = None
 
 __all__ = [
     'upload',
@@ -46,5 +51,5 @@ __all__ = [
     'health',
     'mimic',
     'patient',
-    'ai'  # ✅ Add ai to exports
+    'ai'
 ]
