@@ -10,10 +10,10 @@ from app.api.routes import (
     analytics, auth, disease, doctor, guideline, health, mimic, patient
 )
 
-# Conditional import for AI
+# Conditional import for AI to avoid circular import
 try:
     from app.api.routes import ai
-except ImportError:
+except (ImportError, AttributeError):
     ai = None
 
 logging.basicConfig(level=logging.INFO)
@@ -74,8 +74,11 @@ app.include_router(mimic.router, prefix=API_V1_PREFIX, tags=["MIMIC"])
 app.include_router(patient.router, prefix=API_V1_PREFIX, tags=["Patient"])
 
 # AI Orchestrator (conditional)
-if ai:
+if ai is not None and hasattr(ai, 'router'):
     app.include_router(ai.router, prefix=API_V1_PREFIX, tags=["AI"])
+    logger.info("✅ AI Orchestrator router registered")
+else:
+    logger.warning("⚠️ AI Orchestrator not available")
 
 
 # ============================================================
@@ -86,7 +89,7 @@ async def startup_event():
     logger.info(f"🚀 Starting {settings.APP_NAME} v{settings.APP_VERSION}")
     logger.info("✅ LifeSaver Medical AI Platform is READY! 🎉")
     logger.info("📊 8 Clinical Modules: Lipid, CBC, LFT, KFT, Thyroid, Diabetes, Vitamins, Electrolytes")
-    if ai:
+    if ai is not None:
         logger.info("🤖 AI Orchestrator: Groq + Gemini (Multi-AI Consensus)")
     logger.info("🏥 Doctor Portal: Dataset Upload & Column Mapping")
     logger.info(f"📡 Total Routes: {len(app.routes)}")
@@ -127,7 +130,7 @@ async def root():
         "patient": ["/api/v1/patient/", "/api/v1/patient/{patient_id}"]
     }
     
-    if ai:
+    if ai is not None and hasattr(ai, 'router'):
         endpoints["ai"] = [
             "/api/v1/ai/status",
             "/api/v1/ai/analyze",
@@ -173,15 +176,15 @@ async def api_status():
         "patient": "✅ active"
     }
     
-    if ai:
+    if ai is not None and hasattr(ai, 'router'):
         modules["ai_orchestrator"] = "✅ active (Groq + Gemini)"
     
     return {
         "status": "healthy",
         "version": settings.APP_VERSION,
         "modules": modules,
-        "total_modules": 20 if ai else 19,
-        "endpoints_count": 69 if ai else 65,
+        "total_modules": 20 if ai is not None else 19,
+        "endpoints_count": 69 if ai is not None else 65,
         "docs": "/docs",
         "message": "🎉 All modules are complete! System ready for production!"
     }
