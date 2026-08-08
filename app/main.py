@@ -7,7 +7,8 @@ from app.core.config import settings
 from app.api.routes import (
     upload, analyze, report, admin, blood_test, 
     cbc, lft, kft, thyroid, diabetes, vitamins, electrolytes,
-    analytics, auth, disease, doctor, guideline, health, mimic, patient
+    analytics, auth, disease, doctor, guideline, health, mimic, patient,
+    ai  # ✅ ADDED AI
 )
 
 logging.basicConfig(level=logging.INFO)
@@ -67,6 +68,9 @@ app.include_router(health.router, prefix=API_V1_PREFIX, tags=["Health"])
 app.include_router(mimic.router, prefix=API_V1_PREFIX, tags=["MIMIC"])
 app.include_router(patient.router, prefix=API_V1_PREFIX, tags=["Patient"])
 
+# ✅ AI Orchestrator
+app.include_router(ai.router, prefix=API_V1_PREFIX, tags=["AI"])
+
 
 # ============================================================
 # STARTUP EVENT
@@ -118,7 +122,13 @@ async def root():
             "guideline": ["/api/v1/guideline/", "/api/v1/guideline/{guideline_id}"],
             "health": ["/api/v1/health/", "/api/v1/health/metrics"],
             "mimic": ["/api/v1/mimic/", "/api/v1/mimic/{patient_id}"],
-            "patient": ["/api/v1/patient/", "/api/v1/patient/{patient_id}"]
+            "patient": ["/api/v1/patient/", "/api/v1/patient/{patient_id}"],
+            "ai": [  # ✅ AI ENDPOINTS
+                "/api/v1/ai/status",
+                "/api/v1/ai/analyze",
+                "/api/v1/ai/consensus",
+                "/api/v1/ai/audit-logs"
+            ]
         }
     }
 
@@ -157,7 +167,7 @@ async def api_status():
             "ai_orchestrator": "✅ active (Groq + Gemini)"
         },
         "total_modules": 20,
-        "endpoints_count": 65,
+        "endpoints_count": 69,  # Updated from 65 to 69
         "docs": "/docs",
         "message": "🎉 All modules are complete! System ready for production!"
     }
